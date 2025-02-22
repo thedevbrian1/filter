@@ -1,14 +1,23 @@
 import {
+  data,
   isRouteErrorResponse,
   Links,
   Meta,
   Outlet,
   Scripts,
   ScrollRestoration,
+  useLoaderData,
 } from "react-router";
 
 import type { Route } from "./+types/root";
 import "./app.css";
+import {
+  ThemeBody,
+  ThemeHead,
+  ThemeProvider,
+  useTheme,
+} from "./utils/themeProvider";
+import { getThemeSession } from "./utils/theme.server";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -23,17 +32,29 @@ export const links: Route.LinksFunction = () => [
   },
 ];
 
+export async function loader({ request }: Route.LoaderArgs) {
+  let themeSession = await getThemeSession(request);
+
+  return data({
+    theme: themeSession.getTheme(),
+  });
+}
 export function Layout({ children }: { children: React.ReactNode }) {
+  let data = useLoaderData<typeof loader>();
+  let [theme] = useTheme();
+
   return (
-    <html lang="en">
+    <html lang="en" className={theme ?? ""}>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <Meta />
         <Links />
+        <ThemeHead ssrTheme={Boolean(data.theme)} />
       </head>
       <body>
         {children}
+        <ThemeBody ssrTheme={Boolean(data.theme)} />
         <ScrollRestoration />
         <Scripts />
       </body>
@@ -41,8 +62,16 @@ export function Layout({ children }: { children: React.ReactNode }) {
   );
 }
 
-export default function App() {
+function App() {
   return <Outlet />;
+}
+
+export default function AppWithProviders({ loaderData }: Route.ComponentProps) {
+  return (
+    <ThemeProvider specifiedTheme={loaderData.theme}>
+      <App></App>
+    </ThemeProvider>
+  );
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {

@@ -1,6 +1,6 @@
 import type { Route } from "./+types/home";
-import { Welcome } from "../welcome/welcome";
 import { Form, useLoaderData } from "react-router";
+import { Theme, Themed, useTheme } from "~/utils/themeProvider";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -9,7 +9,7 @@ export function meta({}: Route.MetaArgs) {
   ];
 }
 
-export async function loader({ request }) {
+export async function loader({ request }: Route.LoaderArgs) {
   let choice = new URL(request.url).searchParams.get("choice");
 
   let food = [
@@ -49,28 +49,74 @@ export async function loader({ request }) {
 
 export default function Home() {
   let food = useLoaderData();
+  const [, setTheme] = useTheme();
+
+  const toggleTheme = () => {
+    setTheme((prevTheme) =>
+      prevTheme === Theme.LIGHT ? Theme.DARK : Theme.LIGHT
+    );
+  };
   return (
     <div className="p-6">
-      <h1>Restaurant</h1>
-      <Form>
-        <button className="bg-purple-500" name="choice" value="All">
-          All
-        </button>
-        <button className="bg-green-500" name="choice" value="Pastery">
-          Pastery
-        </button>
-        <button className="bg-orange-500" name="choice" value="Beverages">
-          Beverages
-        </button>
-        <button className="bg-white text-black" name="choice" value="Snacks">
-          Snacks
-        </button>
-      </Form>
-      <ul className="mt-8">
-        {food.map((item, index) => (
-          <li key={index}>{item.name}</li>
-        ))}
-      </ul>
+      <button onClick={toggleTheme}>Toggle</button>
+      <Themed
+        dark={
+          <div className="bg-slate-800">
+            <h1>Restaurant</h1>
+            <Form viewTransition>
+              <button className="bg-purple-500" name="choice" value="All">
+                All
+              </button>
+              <button className="bg-green-500" name="choice" value="Pastery">
+                Pastery
+              </button>
+              <button className="bg-orange-500" name="choice" value="Beverages">
+                Beverages
+              </button>
+              <button
+                className="bg-white text-black"
+                name="choice"
+                value="Snacks"
+              >
+                Snacks
+              </button>
+            </Form>
+            <ul className="mt-8">
+              {food.map((item, index) => (
+                <li key={index}>{item.name}</li>
+              ))}
+            </ul>
+          </div>
+        }
+        light={
+          <div>
+            <h1>Restaurant</h1>
+            <Form viewTransition>
+              <button className="bg-purple-500" name="choice" value="All">
+                All
+              </button>
+              <button className="bg-green-500" name="choice" value="Pastery">
+                Pastery
+              </button>
+              <button className="bg-orange-500" name="choice" value="Beverages">
+                Beverages
+              </button>
+              <button
+                className="bg-white text-black"
+                name="choice"
+                value="Snacks"
+              >
+                Snacks
+              </button>
+            </Form>
+            <ul className="mt-8">
+              {food.map((item, index) => (
+                <li key={index}>{item.name}</li>
+              ))}
+            </ul>
+          </div>
+        }
+      />
     </div>
   );
 }

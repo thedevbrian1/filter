@@ -12,6 +12,7 @@ import {
 enum Theme {
   DARK = "dark",
   LIGHT = "light",
+  SYSTEM = "system",
 }
 const themes: Array<Theme> = Object.values(Theme);
 

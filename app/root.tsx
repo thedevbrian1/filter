@@ -41,6 +41,16 @@ export async function loader({ request }: Route.LoaderArgs) {
 }
 export function Layout({ children }: { children: React.ReactNode }) {
   let data = useLoaderData<typeof loader>();
+
+  return (
+    <ThemeProvider specifiedTheme={data.theme}>
+      <ThemeConsumer>{children}</ThemeConsumer>
+    </ThemeProvider>
+  );
+}
+
+function ThemeConsumer({ children }: { children: React.ReactNode }) {
+  let data = useLoaderData<typeof loader>();
   let [theme] = useTheme();
 
   return (
@@ -62,16 +72,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
   );
 }
 
-function App() {
+export default function App() {
   return <Outlet />;
-}
-
-export default function AppWithProviders({ loaderData }: Route.ComponentProps) {
-  return (
-    <ThemeProvider specifiedTheme={loaderData.theme}>
-      <App></App>
-    </ThemeProvider>
-  );
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {

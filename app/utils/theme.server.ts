@@ -27,3 +27,8 @@ export async function getThemeSession(request: Request) {
     commit: () => themeStorage.commitSession(session),
   };
 }
+
+export async function deleteThemeSession(request: Request) {
+  let session = await themeStorage.getSession(request.headers.get("Cookie"));
+  session.unset("theme");
+}

@@ -42,6 +42,8 @@ export async function loader({ request }: Route.LoaderArgs) {
 export function Layout({ children }: { children: React.ReactNode }) {
   let data = useLoaderData<typeof loader>();
 
+  console.log({ sessionTheme: data.theme });
+
   return (
     <ThemeProvider specifiedTheme={data.theme}>
       <ThemeConsumer>{children}</ThemeConsumer>
@@ -52,6 +54,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
 function ThemeConsumer({ children }: { children: React.ReactNode }) {
   let data = useLoaderData<typeof loader>();
   let [theme] = useTheme();
+
+  console.log({ theme });
 
   return (
     <html lang="en" className={theme ?? ""}>

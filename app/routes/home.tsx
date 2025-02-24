@@ -57,7 +57,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 
 export default function Home() {
   let food = useLoaderData();
-  const [, setTheme] = useTheme();
+  const [theme, setTheme] = useTheme();
 
   // const toggleTheme = () => {
   //   setTheme((prevTheme) =>
@@ -69,22 +69,53 @@ export default function Home() {
       {/* <button onClick={toggleTheme}>Toggle</button> */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon">
-            <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-            <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+          <Button
+            variant="ghost"
+            size="icon"
+            className="w-8 h-8 bg-slate-800 grid place-items-center"
+          >
+            {theme === Theme.LIGHT ? (
+              <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all" />
+            ) : theme === Theme.DARK ? (
+              <Moon className="absolute h-[1.2rem] w-[1.2rem] transition-all" />
+            ) : theme === Theme.SYSTEM ? (
+              <Settings className="absolute h-[1.2rem] w-[1.2rem] transition-all" />
+            ) : null}{" "}
             <span className="sr-only">Toggle theme</span>
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem onClick={() => setTheme(Theme.LIGHT)}>
-            <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 " />{" "}
+          <DropdownMenuItem
+            onClick={() => setTheme(Theme.LIGHT)}
+            className={`${theme === Theme.LIGHT ? "text-red-500" : ""}`}
+          >
+            <Sun
+              className={`${
+                theme === Theme.LIGHT ? "text-current" : ""
+              } h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 `}
+            />{" "}
             Light
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => setTheme(Theme.DARK)}>
-            <Moon className=" h-[1.2rem] w-[1.2rem] transition-all" /> Dark
+          <DropdownMenuItem
+            onClick={() => setTheme(Theme.DARK)}
+            className={`${theme === Theme.DARK ? "text-red-500" : ""}`}
+          >
+            <Moon
+              className={`${
+                theme === Theme.DARK ? "text-current" : ""
+              } h-[1.2rem] w-[1.2rem] transition-all`}
+            />{" "}
+            Dark
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => setTheme(Theme.SYSTEM)}>
-            <Settings className=" h-[1.2rem] w-[1.2rem] transition-all" />{" "}
+          <DropdownMenuItem
+            onClick={() => setTheme(Theme.SYSTEM)}
+            className={`${theme === Theme.SYSTEM ? "text-red-500" : ""}`}
+          >
+            <Settings
+              className={`${
+                theme === Theme.SYSTEM ? "text-current" : ""
+              } h-[1.2rem] w-[1.2rem] transition-all`}
+            />{" "}
             System
           </DropdownMenuItem>
         </DropdownMenuContent>

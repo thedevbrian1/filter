@@ -9,7 +9,7 @@ import {
   useState,
 } from "react";
 
-enum Theme {
+export enum Theme {
   DARK = "dark",
   LIGHT = "light",
   SYSTEM = "system",
@@ -24,7 +24,7 @@ const prefersDarkMQ = "(prefers-color-scheme: dark)";
 const getPreferredTheme = () =>
   window.matchMedia(prefersDarkMQ).matches ? Theme.DARK : Theme.LIGHT;
 
-function ThemeProvider({
+export function ThemeProvider({
   children,
   specifiedTheme,
 }: {
@@ -40,7 +40,8 @@ function ThemeProvider({
       if (themes.includes(specifiedTheme)) {
         return specifiedTheme;
       } else {
-        return null;
+        // return null;
+        return Theme.SYSTEM;
       }
     }
 
@@ -50,7 +51,8 @@ function ThemeProvider({
       return null;
     }
 
-    return getPreferredTheme();
+    // return getPreferredTheme();
+    return Theme.SYSTEM;
   });
 
   const persistTheme = useFetcher();
@@ -78,6 +80,7 @@ function ThemeProvider({
   }, [theme]);
 
   useEffect(() => {
+    if (theme !== Theme.SYSTEM) return;
     const mediaQuery = window.matchMedia(prefersDarkMQ);
     const handleChange = () => {
       setTheme(mediaQuery.matches ? Theme.DARK : Theme.LIGHT);
@@ -85,6 +88,17 @@ function ThemeProvider({
     mediaQuery.addEventListener("change", handleChange);
     return () => mediaQuery.removeEventListener("change", handleChange);
   }, []);
+
+  // TODO: The theme does not update dynamically when you switch from the device while it is set to 'system'
+
+  useEffect(() => {
+    if (!theme || theme !== Theme.SYSTEM) return;
+    const effectiveTheme = theme === Theme.SYSTEM ? getPreferredTheme() : theme;
+    document.documentElement.classList.toggle(
+      "dark",
+      effectiveTheme === Theme.DARK
+    );
+  }, [theme]);
 
   return (
     <ThemeContext.Provider value={[theme, setTheme]}>
@@ -162,7 +176,7 @@ const themeStylesCode = `
   }
 `;
 
-function ThemeHead({ ssrTheme }: { ssrTheme: boolean }) {
+export function ThemeHead({ ssrTheme }: { ssrTheme: boolean }) {
   const [theme] = useTheme();
 
   return (
@@ -219,7 +233,7 @@ const clientDarkAndLightModeElsCode = `;(() => {
   }
 })();`;
 
-function ThemeBody({ ssrTheme }: { ssrTheme: boolean }) {
+export function ThemeBody({ ssrTheme }: { ssrTheme: boolean }) {
   return ssrTheme ? null : (
     <script
       dangerouslySetInnerHTML={{ __html: clientDarkAndLightModeElsCode }}
@@ -227,7 +241,7 @@ function ThemeBody({ ssrTheme }: { ssrTheme: boolean }) {
   );
 }
 
-function useTheme() {
+export function useTheme() {
   const context = useContext(ThemeContext);
   if (context === undefined) {
     throw new Error("useTheme must be used within a ThemeProvider");
@@ -240,7 +254,7 @@ function useTheme() {
  * worrying about whether it'll SSR properly when we don't actually know
  * the user's preferred theme.
  */
-function Themed({
+export function Themed({
   dark,
   light,
   initialOnly = false,
@@ -269,16 +283,6 @@ function Themed({
   return <>{themeToReference === "light" ? light : dark}</>;
 }
 
-function isTheme(value: unknown): value is Theme {
+export function isTheme(value: unknown): value is Theme {
   return typeof value === "string" && themes.includes(value as Theme);
 }
-
-export {
-  isTheme,
-  Theme,
-  Themed,
-  ThemeBody,
-  ThemeHead,
-  ThemeProvider,
-  useTheme,
-};

@@ -1,6 +1,12 @@
 import { Moon, Settings, Sun } from "lucide-react";
 import type { Route } from "./+types/home";
-import { data, Form, useFetcher, useLoaderData } from "react-router";
+import {
+  data,
+  Form,
+  useFetcher,
+  useLoaderData,
+  useNavigation,
+} from "react-router";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,9 +15,10 @@ import {
 } from "~/components/ui/dropdown-menu";
 import { Theme, Themed, useTheme } from "~/utils/themeProvider";
 import { Button } from "~/components/ui/button";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 // import { themeStorage } from "~/utils/theme.server";
 import { commitSession, getSession } from "~/utils/session.server";
+import { flushSync } from "react-dom";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -27,6 +34,7 @@ export async function loader({ request }: Route.LoaderArgs) {
   let session = await getSession(request.headers.get("Cookie"));
 
   let themeChoice = session.get("user-choice");
+  let items = session.get("items");
 
   console.log({ themeChoice });
 
@@ -62,7 +70,7 @@ export async function loader({ request }: Route.LoaderArgs) {
     filteredList = food;
   }
 
-  return { filteredList, themeChoice };
+  return { filteredList, themeChoice, items };
 }
 
 export async function action({ request }: Route.ActionArgs) {
@@ -70,6 +78,26 @@ export async function action({ request }: Route.ActionArgs) {
   let session = await getSession(request.headers.get("Cookie"));
 
   let formData = await request.formData();
+  let action = String(formData.get("_action"));
+
+  if (action === "s") {
+    return null;
+  } else if (action === "item") {
+    let item = String(formData.get("item"));
+    let itemsArray = session.get("items") ?? [];
+    itemsArray.push(item);
+
+    session.set("items", itemsArray);
+    return data(
+      { ok: true },
+      {
+        headers: {
+          "Set-Cookie": await commitSession(session),
+        },
+      }
+    );
+  }
+
   let userChoice = String(formData.get("userChoice"));
   console.log({ userChoice });
 
@@ -87,20 +115,66 @@ export async function action({ request }: Route.ActionArgs) {
 }
 
 export default function Home() {
-  let { filteredList, themeChoice } = useLoaderData();
+  let { filteredList, themeChoice, items } = useLoaderData();
   const [theme, setTheme] = useTheme();
   // let [selectedTheme, setSelectedTheme] = useState(theme);
 
   let themeFetcher = useFetcher();
 
+  let navigation = useNavigation();
+  let isSubmitting = navigation.state === "submitting";
+
+  let isOptimistic =
+    navigation.state !== "idle" && navigation.formData?.get("item");
+
+  let [counter, setCounter] = useState(0);
+  let [isShowing, setIsShowing] = useState(false);
+
+  let itemFormRef = useRef(null);
   // const toggleTheme = () => {
   //   setTheme((prevTheme) =>
   //     prevTheme === Theme.LIGHT ? Theme.DARK : Theme.LIGHT
   //   );
   // };
+
+  useEffect(() => {
+    if (!isSubmitting) {
+      itemFormRef.current?.reset();
+    }
+  }, [isSubmitting]);
+
   return (
     <div className="p-6">
       {/* <button onClick={toggleTheme}>Toggle</button> */}
+      {/* FIXME: Synchronize the theme that the user selected with the current theme on first render */}
+      <button
+        className="bg-pink-700 hover:bg-pink-500 px-4 py-2 rounded-lg"
+        onClick={() => {
+          document.startViewTransition(() => {
+            flushSync(() => setIsShowing((prev) => !prev));
+          });
+          // setIsShowing((prev) => !prev);
+        }}
+      >
+        Toggle
+      </button>
+      {isShowing ? (
+        <div
+          className="bg-black w-60 aspect-square"
+          style={{ viewTransitionName: "sq" }}
+        ></div>
+      ) : null}
+
+      <Form method="post" viewTransition>
+        <button
+          name="_action"
+          value="s"
+          className="btn-transition bg-green-700 hover:bg-green-500 px-4 py-2 rounded-lg"
+          style={{ inlineSize: isSubmitting ? "120px" : "80px" }}
+        >
+          {isSubmitting ? "Submitting..." : "Send"}
+        </button>
+      </Form>
       <themeFetcher.Form>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -178,7 +252,27 @@ export default function Home() {
         </DropdownMenu>
       </themeFetcher.Form>
       <div className="dark:bg-black">
-        <h1 className="dark:text-red-500">Restaurant</h1>
+        <Form method="post" ref={itemFormRef} viewTransition>
+          <input type="hidden" name="_action" value="item" />
+          <label>
+            Item
+            <input type="text" name="item" className="block p-3 bg-gray-500" />
+          </label>
+        </Form>
+        <h2>Items</h2>
+        <ul>
+          {items?.map((item, index) => (
+            <li key={index} style={{ viewTransitionName: `item-${index}` }}>
+              {item}
+            </li>
+          ))}
+          {/* {isOptimistic ? (
+            <li style={{ viewTransitionName: "item-optimistic" }}>
+              {navigation.formData?.get("item")}
+            </li>
+          ) : null} */}
+        </ul>
+        {/* <h1 className="dark:text-red-500">Restaurant</h1>
         <Form viewTransition>
           <button className="bg-purple-500" name="choice" value="All">
             All
@@ -197,7 +291,7 @@ export default function Home() {
           {filteredList.map((item, index) => (
             <li key={index}>{item.name}</li>
           ))}
-        </ul>
+        </ul> */}
       </div>
       {/* <Themed
         dark={

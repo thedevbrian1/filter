@@ -136,3 +136,15 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+.btn-transition {
+  view-transition-name: btn;
+  inline-size: 80px;
+}
+
+::view-transition-new(btn),
+::view-transition-old(btn) {
+  /* height: 100%;
+  width: 100%; */
+  inline-size: 100%;
+}

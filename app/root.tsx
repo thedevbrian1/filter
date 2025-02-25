@@ -35,10 +35,15 @@ export const links: Route.LinksFunction = () => [
 export async function loader({ request }: Route.LoaderArgs) {
   let themeSession = await getThemeSession(request);
 
+  let theme = themeSession.getTheme();
+
+  let validTheme = theme !== "system" ? theme : null;
+
   return data({
-    theme: themeSession.getTheme(),
+    theme: validTheme,
   });
 }
+
 export function Layout({ children }: { children: React.ReactNode }) {
   let data = useLoaderData<typeof loader>();
 

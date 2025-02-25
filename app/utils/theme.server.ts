@@ -5,7 +5,7 @@ import type { Theme } from "./themeProvider";
 // Make use to set the environment variable SESSION_SECRET before running the code
 const sessionSecret = process.env.SESSION_SECRET ?? "DEFAULT_SECRET";
 
-const themeStorage = createCookieSessionStorage({
+export const themeStorage = createCookieSessionStorage({
   cookie: {
     name: "my_remix_theme",
     secure: true,
@@ -26,6 +26,16 @@ export async function getThemeSession(request: Request) {
     setTheme: (theme: Theme) => session.set("theme", theme),
     commit: () => themeStorage.commitSession(session),
   };
+}
+
+export async function getUserChoice(request: Request) {
+  const session = await themeStorage.getSession(request.headers.get("Cookie"));
+  return session.get("user-choice");
+}
+
+export async function setUserChoice(request: Request, choice: string) {
+  const session = await themeStorage.getSession(request.headers.get("Cookie"));
+  session.set("user-choice", choice);
 }
 
 export async function deleteThemeSession(request: Request) {

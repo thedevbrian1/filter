@@ -51,8 +51,8 @@ export function ThemeProvider({
       return null;
     }
 
-    // return getPreferredTheme();
-    return Theme.SYSTEM;
+    return getPreferredTheme();
+    // return Theme.SYSTEM;
   });
 
   const persistTheme = useFetcher();
@@ -79,25 +79,36 @@ export function ThemeProvider({
     );
   }, [theme]);
 
-  useEffect(() => {
-    if (theme !== Theme.SYSTEM) return;
-    const mediaQuery = window.matchMedia(prefersDarkMQ);
-    const handleChange = () => {
-      setTheme(mediaQuery.matches ? Theme.DARK : Theme.LIGHT);
-    };
-    mediaQuery.addEventListener("change", handleChange);
-    return () => mediaQuery.removeEventListener("change", handleChange);
-  }, []);
+  // useEffect(() => {
+  //   if (!theme) return;
+  //   const mediaQuery = window.matchMedia(prefersDarkMQ);
+  //   const handleChange = () => {
+  //     setTheme(mediaQuery.matches ? Theme.DARK : Theme.LIGHT);
+  //   };
+  //   mediaQuery.addEventListener("change", handleChange);
+  //   return () => mediaQuery.removeEventListener("change", handleChange);
+  // }, [theme]);
 
   // TODO: The theme does not update dynamically when you switch from the device while it is set to 'system'
 
   useEffect(() => {
-    if (!theme || theme !== Theme.SYSTEM) return;
+    if (!theme) return;
     const effectiveTheme = theme === Theme.SYSTEM ? getPreferredTheme() : theme;
     document.documentElement.classList.toggle(
       "dark",
       effectiveTheme === Theme.DARK
     );
+
+    // Add a listener for system changes when theme is SYSTEM
+    if (theme === Theme.SYSTEM) {
+      const mediaQuery = window.matchMedia(prefersDarkMQ);
+      const handleChange = () => {
+        // No setTheme here; just trigger DOM update directly
+        document.documentElement.classList.toggle("dark", mediaQuery.matches);
+      };
+      mediaQuery.addEventListener("change", handleChange);
+      return () => mediaQuery.removeEventListener("change", handleChange);
+    }
   }, [theme]);
 
   return (

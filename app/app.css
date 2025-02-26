@@ -148,3 +148,17 @@ body {
   width: 100%; */
   inline-size: 100%;
 }
+
+.cool-btn {
+  position: relative;
+}
+
+.cool-btn:active::after {
+  position: absolute;
+  right: 0;
+  left: 0;
+  background-color: red;
+  height: 4px;
+  bottom: -8px;
+  /* view-transition-name: cool; */
+}

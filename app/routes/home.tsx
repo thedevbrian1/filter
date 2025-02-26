@@ -252,7 +252,7 @@ export default function Home() {
         </DropdownMenu>
       </themeFetcher.Form>
       <div className="dark:bg-black">
-        <Form method="post" ref={itemFormRef} viewTransition>
+        {/* <Form method="post" ref={itemFormRef} viewTransition>
           <input type="hidden" name="_action" value="item" />
           <label>
             Item
@@ -266,12 +266,12 @@ export default function Home() {
               {item}
             </li>
           ))}
-          {/* {isOptimistic ? (
+          {isOptimistic ? (
             <li style={{ viewTransitionName: "item-optimistic" }}>
               {navigation.formData?.get("item")}
             </li>
-          ) : null} */}
-        </ul>
+          ) : null}
+        </ul> */}
         {/* <h1 className="dark:text-red-500">Restaurant</h1>
         <Form viewTransition>
           <button className="bg-purple-500" name="choice" value="All">

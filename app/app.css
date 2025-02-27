@@ -149,16 +149,58 @@ body {
   inline-size: 100%;
 }
 
-.cool-btn {
+/* .cool-btn {
   position: relative;
+} */
+
+/* .cool-btn:active {
+  view-transition-name: cool;
+} */
+
+.image-list a.transitioning img {
+  view-transition-name: image;
 }
 
-.cool-btn:active::after {
-  position: absolute;
-  right: 0;
-  left: 0;
-  background-color: red;
-  height: 4px;
-  bottom: -8px;
-  /* view-transition-name: cool; */
+.event-list a.transitioning::after {
+  view-transition-name: aa;
+}
+
+@keyframes slide-out {
+  to {
+    transform: translateY(-30px);
+    opacity: 0;
+  }
+}
+
+@keyframes slide-in {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+}
+
+@keyframes arcMove {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  50% {
+    transform: translate(-50px, -50px) rotate(-45deg);
+  }
+  100% {
+    transform: translate(-100px, -100px) rotate(-90deg);
+  }
+}
+
+.count-display {
+  view-transition-name: counter;
+  /* transform-origin: center bottom; */
+}
+
+::view-transition-old(counter) {
+  animation: 300ms ease-in both arcMove;
+  transform-origin: center center;
+}
+
+::view-transition-new(counter) {
+  animation: 100ms ease-out both slide-in;
 }

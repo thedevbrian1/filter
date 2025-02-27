@@ -3,6 +3,7 @@ import type { Route } from "./+types/home";
 import {
   data,
   Form,
+  NavLink,
   useFetcher,
   useLoaderData,
   useNavigation,
@@ -19,6 +20,12 @@ import { useEffect, useRef, useState } from "react";
 // import { themeStorage } from "~/utils/theme.server";
 import { commitSession, getSession } from "~/utils/session.server";
 import { flushSync } from "react-dom";
+
+export const images = [
+  "https://remix.run/blog-images/headers/the-future-is-now.jpg",
+  "https://remix.run/blog-images/headers/waterfall.jpg",
+  "https://remix.run/blog-images/headers/webpack.png",
+];
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -127,7 +134,7 @@ export default function Home() {
   let isOptimistic =
     navigation.state !== "idle" && navigation.formData?.get("item");
 
-  let [counter, setCounter] = useState(0);
+  let [count, setCount] = useState(0);
   let [isShowing, setIsShowing] = useState(false);
 
   let itemFormRef = useRef(null);
@@ -145,27 +152,37 @@ export default function Home() {
 
   return (
     <div className="p-6">
+      {/* <ul className="flex gap-2 image-list">
+        {images.map((item, index) => (
+          <li key={index} className="aspect-square w-40">
+            <NavLink to={`/images/${index}`} viewTransition>
+              <img src={item} alt="" className="w-full h-full object-cover" />
+            </NavLink>
+          </li>
+        ))}
+      </ul> */}
       {/* <button onClick={toggleTheme}>Toggle</button> */}
       {/* FIXME: Synchronize the theme that the user selected with the current theme on first render */}
       <button
         className="bg-pink-700 hover:bg-pink-500 px-4 py-2 rounded-lg"
         onClick={() => {
           document.startViewTransition(() => {
-            flushSync(() => setIsShowing((prev) => !prev));
+            flushSync(() => setCount((prev) => prev + 1));
           });
+          // setCount((prev) => prev + 1);
           // setIsShowing((prev) => !prev);
         }}
       >
-        Toggle
+        Increment
       </button>
-      {isShowing ? (
-        <div
-          className="bg-black w-60 aspect-square"
-          style={{ viewTransitionName: "sq" }}
-        ></div>
-      ) : null}
+      <div
+        className="text-3xl mt-4 count-display"
+        // style={{ viewTransitionName: "sq" }}
+      >
+        {count}
+      </div>
 
-      <Form method="post" viewTransition>
+      <Form method="post" viewTransition className="mt-20">
         <button
           name="_action"
           value="s"

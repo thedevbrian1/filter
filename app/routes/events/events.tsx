@@ -9,22 +9,22 @@ export default function Events() {
     },
     {
       title: "Sports",
-      path: "sports",
+      path: "/sports",
       id: 2,
     },
     {
       title: "Theatre",
-      path: "theatre",
+      path: "/theatre",
       id: 3,
     },
     {
       title: "Concerts",
-      path: "concerts",
+      path: "/concerts",
       id: 4,
     },
     {
       title: "Festivals",
-      path: "festivals",
+      path: "/festivals",
       id: 5,
     },
   ];
@@ -32,13 +32,14 @@ export default function Events() {
     <main>
       <h1>Events</h1>
       <nav>
-        <ul className="flex gap-2">
+        <ul className="flex gap-2 event-list">
           {navLinks.map((item) => (
             <li key={item.id}>
               <NavLink
-                to={`/events/${item.path}`}
+                to={`/events${item.path}`}
+                end
                 viewTransition
-                // style={{ viewTransitionName: `link` }}
+                // style={{ viewTransitionName: `link-${item.id}` }}
                 className={({ isActive }) =>
                   `relative ${
                     isActive
@@ -46,7 +47,6 @@ export default function Events() {
                       : ""
                   }`
                 }
-                // className="cool-btn"
               >
                 {item.title}
               </NavLink>

@@ -6,5 +6,6 @@ export default [
     index("routes/events/index.tsx"),
     route(":id", "routes/events/event.tsx"),
   ]),
+  route("images/:id", "routes/image.tsx"),
   route("action/set-theme", "routes/set-theme.ts"),
 ] satisfies RouteConfig;

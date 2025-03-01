@@ -181,16 +181,24 @@ export default function Home({ loaderData }: Route.ComponentProps) {
 
   return (
     <div className="p-6">
-      <ol className="flex gap-2">
+      <ol className="flex gap-4">
         {steps.map((item, index) => (
           <li
             key={index}
-            className={`flex flex-col items-center justify-end ${
+            className={`flex items-center gap-2 ${
               item.step === Number(page) ? "text-white" : ""
             } ${item.step < Number(page) ? "text-green-500" : "text-gray-500"}`}
           >
-            {item.step < Number(page) ? <Check /> : <>&nbsp;</>}{" "}
-            {`${index + 1})`} {item.title}
+            {/* {item.step < Number(page) ? <Check /> : <>&nbsp;</>}{" "} */}
+            <span
+              className={`w-8 h-8 rounded-full border border-white grid place-items-center ${
+                item.step < Number(page) ? "bg-green-500 text-black" : ""
+              }`}
+            >
+              {" "}
+              {item.step < Number(page) ? <Check /> : `${index + 1}`}{" "}
+            </span>
+            {item.title}
           </li>
         ))}
       </ol>

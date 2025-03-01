@@ -1,4 +1,4 @@
-import { Moon, Settings, Sun } from "lucide-react";
+import { Check, Moon, Settings, Sun } from "lucide-react";
 import type { Route } from "./+types/home";
 import {
   data,
@@ -158,6 +158,21 @@ export default function Home({ loaderData }: Route.ComponentProps) {
   //   );
   // };
 
+  let steps = [
+    {
+      title: "Personal info",
+      step: 1,
+    },
+    {
+      title: "Account info",
+      step: 2,
+    },
+    {
+      title: "Message",
+      step: 3,
+    },
+  ];
+
   useEffect(() => {
     if (!isSubmitting) {
       itemFormRef.current?.reset();
@@ -166,6 +181,19 @@ export default function Home({ loaderData }: Route.ComponentProps) {
 
   return (
     <div className="p-6">
+      <ol className="flex gap-2">
+        {steps.map((item, index) => (
+          <li
+            key={index}
+            className={`flex flex-col items-center justify-end ${
+              item.step === Number(page) ? "text-white" : ""
+            } ${item.step < Number(page) ? "text-green-500" : "text-gray-500"}`}
+          >
+            {item.step < Number(page) ? <Check /> : <>&nbsp;</>}{" "}
+            {`${index + 1})`} {item.title}
+          </li>
+        ))}
+      </ol>
       <Form method="post" viewTransition className="cool-form">
         <input type="hidden" name="type" value="multistep" />
         <fieldset>
@@ -211,10 +239,28 @@ export default function Home({ loaderData }: Route.ComponentProps) {
                 />
               </label>
             </div>
+          ) : Number(page) === 3 ? (
+            <label>
+              Message
+              <textarea
+                name="message"
+                className="block border border-gray-500 px-2 py-3 rounded-lg mt-2"
+              ></textarea>
+            </label>
           ) : null}
 
-          <div className="mt-4">
-            {Number(page) === 1 ? (
+          <div className="mt-4 flex gap-2">
+            {Number(page) !== 1 ? (
+              <button
+                type="submit"
+                name="_action"
+                value="back"
+                className="bg-white px-4 py-2 rounded-lg text-black"
+              >
+                Back
+              </button>
+            ) : null}
+            {Number(page) !== 3 ? (
               <button
                 type="submit"
                 name="_action"
@@ -223,25 +269,17 @@ export default function Home({ loaderData }: Route.ComponentProps) {
               >
                 Next
               </button>
-            ) : Number(page) === 2 ? (
-              <div className="flex gap-2">
-                <button
-                  type="submit"
-                  name="_action"
-                  value="back"
-                  className="bg-white px-4 py-2 rounded-lg text-black"
-                >
-                  Back
-                </button>
-                <button
-                  type="submit"
-                  name="_action"
-                  value="submit"
-                  className="bg-green-700 px-4 py-2 rounded-lg"
-                >
-                  Submit
-                </button>
-              </div>
+            ) : null}
+
+            {Number(page) === 3 ? (
+              <button
+                type="submit"
+                name="_action"
+                value="submit"
+                className="bg-green-700 px-4 py-2 rounded-lg"
+              >
+                Submit
+              </button>
             ) : null}
           </div>
         </fieldset>

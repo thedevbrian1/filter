@@ -4,8 +4,9 @@ import {
   data,
   Form,
   NavLink,
+  redirect,
   useFetcher,
-  useLoaderData,
+  // useLoaderData,
   useNavigation,
 } from "react-router";
 import {
@@ -16,7 +17,7 @@ import {
 } from "~/components/ui/dropdown-menu";
 import { Theme, Themed, useTheme } from "~/utils/themeProvider";
 import { Button } from "~/components/ui/button";
-import { useEffect, useRef, useState } from "react";
+import { act, useEffect, useRef, useState } from "react";
 // import { themeStorage } from "~/utils/theme.server";
 import { commitSession, getSession } from "~/utils/session.server";
 import { flushSync } from "react-dom";
@@ -36,6 +37,7 @@ export function meta({}: Route.MetaArgs) {
 
 export async function loader({ request }: Route.LoaderArgs) {
   let choice = new URL(request.url).searchParams.get("choice");
+  let page = new URL(request.url).searchParams.get("page") ?? "1";
 
   // let session = await themeStorage.getSession(request.headers.get("Cookie"));
   let session = await getSession(request.headers.get("Cookie"));
@@ -77,16 +79,28 @@ export async function loader({ request }: Route.LoaderArgs) {
     filteredList = food;
   }
 
-  return { filteredList, themeChoice, items };
+  return { filteredList, themeChoice, items, page };
 }
 
 export async function action({ request }: Route.ActionArgs) {
   // const session = await themeStorage.getSession(request.headers.get("Cookie"));
   let session = await getSession(request.headers.get("Cookie"));
+  let page = Number(new URL(request.url).searchParams.get("page") ?? "1");
 
   let formData = await request.formData();
   let action = String(formData.get("_action"));
+  let type = String(formData.get("type"));
 
+  let nextPage = page + (action === "next" ? 1 : -1);
+
+  if (type === "multistep") {
+    return redirect(`?page=${nextPage}`, {
+      headers: {
+        // "Set-Cookie": await themeStorage.commitSession(session),
+        "Set-Cookie": await commitSession(session),
+      },
+    });
+  }
   if (action === "s") {
     return null;
   } else if (action === "item") {
@@ -121,8 +135,8 @@ export async function action({ request }: Route.ActionArgs) {
   );
 }
 
-export default function Home() {
-  let { filteredList, themeChoice, items } = useLoaderData();
+export default function Home({ loaderData }: Route.ComponentProps) {
+  let { filteredList, themeChoice, items, page } = loaderData;
   const [theme, setTheme] = useTheme();
   // let [selectedTheme, setSelectedTheme] = useState(theme);
 
@@ -152,6 +166,86 @@ export default function Home() {
 
   return (
     <div className="p-6">
+      <Form method="post" viewTransition className="cool-form">
+        <input type="hidden" name="type" value="multistep" />
+        <fieldset>
+          {Number(page) === 1 ? (
+            <div className="space-y-4">
+              <label>
+                Name
+                <input
+                  type="text"
+                  name="name"
+                  placeholder="Brian"
+                  className="border border-gray-500 px-2 py-3 rounded-lg block mt-2"
+                />
+              </label>
+              <label>
+                Phone
+                <input
+                  type="text"
+                  name="phone"
+                  placeholder="0712 345 678"
+                  className="border border-gray-500 px-2 py-3 rounded-lg block mt-2"
+                />
+              </label>
+            </div>
+          ) : Number(page) === 2 ? (
+            <div>
+              <label>
+                Email
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="brian@email.com"
+                  className="border border-gray-500 px-2 py-3 rounded-lg block mt-2"
+                />
+              </label>
+
+              <label>
+                Password
+                <input
+                  type="password"
+                  name="password"
+                  className="border border-gray-500 px-2 py-3 rounded-lg block mt-2"
+                />
+              </label>
+            </div>
+          ) : null}
+
+          <div className="mt-4">
+            {Number(page) === 1 ? (
+              <button
+                type="submit"
+                name="_action"
+                value="next"
+                className="bg-amber-700 hover:bg-amber-500 px-4 py-2 rounded-lg"
+              >
+                Next
+              </button>
+            ) : Number(page) === 2 ? (
+              <div className="flex gap-2">
+                <button
+                  type="submit"
+                  name="_action"
+                  value="back"
+                  className="bg-white px-4 py-2 rounded-lg text-black"
+                >
+                  Back
+                </button>
+                <button
+                  type="submit"
+                  name="_action"
+                  value="submit"
+                  className="bg-green-700 px-4 py-2 rounded-lg"
+                >
+                  Submit
+                </button>
+              </div>
+            ) : null}
+          </div>
+        </fieldset>
+      </Form>
       {/* <ul className="flex gap-2 image-list">
         {images.map((item, index) => (
           <li key={index} className="aspect-square w-40">
@@ -163,7 +257,7 @@ export default function Home() {
       </ul> */}
       {/* <button onClick={toggleTheme}>Toggle</button> */}
       {/* FIXME: Synchronize the theme that the user selected with the current theme on first render */}
-      <button
+      {/* <button
         className="bg-pink-700 hover:bg-pink-500 px-4 py-2 rounded-lg"
         onClick={() => {
           document.startViewTransition(() => {
@@ -174,13 +268,12 @@ export default function Home() {
         }}
       >
         Increment
-      </button>
-      <div
+      </button> */}
+      {/* <div
         className="text-3xl mt-4 count-display"
-        // style={{ viewTransitionName: "sq" }}
       >
         {count}
-      </div>
+      </div> */}
 
       <Form method="post" viewTransition className="mt-20">
         <button

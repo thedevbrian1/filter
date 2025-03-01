@@ -165,6 +165,41 @@ body {
   view-transition-name: aa;
 }
 
+.count-display {
+  view-transition-name: counter;
+  /* transform-origin: center bottom; */
+}
+
+.cool-form {
+  view-transition-name: cool-form;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes to-left {
+  to {
+    transform: translateX(-80px);
+    opacity: 0;
+  }
+}
+
+@keyframes from-right {
+  from {
+    transform: translateX(80px);
+    opacity: 0;
+  }
+}
+
 @keyframes slide-out {
   to {
     transform: translateY(-30px);
@@ -184,16 +219,11 @@ body {
     transform: translate(0, 0) rotate(0deg);
   }
   50% {
-    transform: translate(-50px, -50px) rotate(-45deg);
+    transform: translate(50px, 50px) rotate(45deg);
   }
   100% {
-    transform: translate(-100px, -100px) rotate(-90deg);
+    transform: translate(100px, 0) rotate(90deg);
   }
-}
-
-.count-display {
-  view-transition-name: counter;
-  /* transform-origin: center bottom; */
 }
 
 ::view-transition-old(counter) {
@@ -204,3 +234,24 @@ body {
 ::view-transition-new(counter) {
   animation: 100ms ease-out both slide-in;
 }
+
+::view-transition-old(cool-form) {
+  animation: 90ms cubic-bezier(0.4, 0, 1, 1) both fade-out,
+    300ms cubic-bezier(0.4, 0, 0.2, 1) both to-left;
+}
+::view-transition-new(cool-form) {
+  animation: 90ms cubic-bezier(0.4, 0, 1, 1) both fade-in,
+    300ms cubic-bezier(0.4, 0, 0.2, 1) both from-right;
+}
+
+/* Entry transition */
+/* ::view-transition-new(cool-form):only-child {
+  animation: 300ms cubic-bezier(0, 0, 0.2, 1) both fade-in,
+    300ms cubic-bezier(0.4, 0, 0.2, 1) both from-right;
+} */
+
+/* Exit transition */
+/* ::view-transition-old(cool-form):only-child {
+  animation: 150ms cubic-bezier(0.4, 0, 1, 1) both fade-out,
+    300ms cubic-bezier(0.4, 0, 0.2, 1) both to-left;
+} */

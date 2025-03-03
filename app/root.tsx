@@ -10,7 +10,8 @@ import {
 } from "react-router";
 
 import type { Route } from "./+types/root";
-import "./app.css";
+import tailwindStyles from "./styles/app.css?url";
+import subscribeStyles from "./styles/subscribe.css?url";
 import {
   ThemeBody,
   ThemeHead,
@@ -29,6 +30,14 @@ export const links: Route.LinksFunction = () => [
   {
     rel: "stylesheet",
     href: "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap",
+  },
+  {
+    rel: "stylesheet",
+    href: tailwindStyles,
+  },
+  {
+    rel: "stylesheet",
+    href: subscribeStyles,
   },
 ];
 

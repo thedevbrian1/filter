@@ -27,7 +27,7 @@ export default function Movie({ loaderData }: Route.ComponentProps) {
   let [isHovered, setIsHovered] = useState(false);
 
   return (
-    <main className="px-6 max-w-6xl mx-auto mt-20 movie-detail">
+    <main className="px-6 pb-8 max-w-6xl mx-auto mt-20 movie-detail">
       {/* <Link
         to="/movies"
         prefetch="intent"
@@ -38,7 +38,7 @@ export default function Movie({ loaderData }: Route.ComponentProps) {
         <ArrowLeft /> Back to movies
       </Link> */}
       <Button
-        className={`flex gap-2 hover:gap-4 transition-all ease-in-out duration-300 items-center`}
+        className={`flex gap-2 hover:gap-4 active:scale-[.97] focus-visible:border-none focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-offset-2 focus-visible:ring-rose-700 transition-all ease-in-out duration-300 items-center`}
         variant="outline"
         onClick={() => navigate(-1)}
         // onMouseEnter={(e) => {
@@ -62,7 +62,7 @@ export default function Movie({ loaderData }: Route.ComponentProps) {
           </span>
           <p
             className="mt-4 text-gray-300"
-            style={{ viewTransitionName: "details" }}
+            // style={{ viewTransitionName: "details" }}
           >
             {loaderData.overview}
           </p>
@@ -70,7 +70,7 @@ export default function Movie({ loaderData }: Route.ComponentProps) {
         <img
           src={`https://image.tmdb.org/t/p/w500${loaderData.poster_path}`}
           alt={`Poster for ${loaderData.title}`}
-          className="lg:order-1"
+          className="lg:order-1 w-full aspect-[3/4] object-cover rounded-lg"
         />
       </div>
     </main>

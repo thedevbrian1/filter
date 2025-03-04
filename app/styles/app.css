@@ -292,3 +292,29 @@ html:active-view-transition-type(b) {
 .movie-detail span {
   view-transition-name: movie-rating;
 }
+
+.movie-detail p {
+  view-transition-name: movie-overview;
+}
+
+@keyframes slide-up {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+}
+
+@keyframes slide-down {
+  to {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+}
+
+::view-transition-new(movie-overview):only-child {
+  animation: 300ms ease-out slide-up;
+}
+
+/* ::view-transition-old(movie-overview):only-child {
+  animation: 300ms ease-in slide-down;
+} */
